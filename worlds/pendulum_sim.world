@@ -1,0 +1,8 @@
+<sdf version="1.7">
+  <world name="default">
+    <include>
+      <uri>model://iris_pendulum</uri>
+    </include>
+  </world>
+</sdf>
+
