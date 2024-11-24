@@ -20,7 +20,8 @@ private:
     physics::LinkPtr baseLink, pendulum, load;
     physics::JointPtr pendulumJoint, loadJoint;
     event::ConnectionPtr updateConnection;
-    std::ofstream logFile;
+    std::ofstream logTxtFile;
+    std::ofstream logCsvFile;
     bool isFileInitialized = false;
     double Param[4] = {1.5, 0.2, 1, 9.8};
     double Kv15[15] = {2.2667,  3.2469,  3.2469,    3.0876,    8.5803,    8.5803,   -0.0224 ,   9.8503,      9.8503,    0 , 5.4498,  5.4498,     0,   -0.0316, -0.0316};
@@ -117,29 +118,37 @@ public:
         }
 
         // Delete the existing log file if it exists
-        const std::string fileName = "log.csv";
-        if (std::filesystem::exists(fileName))
+        if (std::filesystem::exists("log.txt"))
         {
-            std::filesystem::remove(fileName);
+            std::filesystem::remove("log.txt");
+        }
+        if (std::filesystem::exists("log.csv"))
+        {
+            std::filesystem::remove("log.csv");
         }
 
         // Create and open CSV file
-        logFile.open("log.txt", std::ios::out);
-        if (!logFile.is_open())
+        logTxtFile.open("log.txt", std::ios::out);
+        if (!logTxtFile.is_open())
+        {
+            gzerr << "Unable to open or create txt file for logging!\n";
+            return;
+        }
+        logCsvFile.open("log.csv", std::ios::out);
+        if (!logTxtFile.is_open())
         {
             gzerr << "Unable to open or create CSV file for logging!\n";
             return;
         }
 
-        // Write header to CSV if not initialized
+        // Write header to txt if not initialized
         if (!isFileInitialized)
         {
-            logFile << "Time,PosX,PosY,PosZ,Roll,Pitch,Yaw,VelX,VelY,VelZ,"
-                    << "Alpha,Beta,GammaAlpha,GammaBeta,ForceX,ForceY,ForceZ\n";
+            logTxtFile << "LOG FILE -- FULL STATES\n";
+            logCsvFile << "Time,Des_Pos_X,Des_Pos_Y,Des_Pos_Z,Quad_Pos_X,Quad_Pos_Y,Quad_Pos_Z,"
+                   << "Roll,Pitch,Yaw,Vx,Vy,Vz,Alpha,Beta,GammaAlpha,GammaBeta,Fx,Fy,Fz\n";
             isFileInitialized = true;
         }
-
-        #include <iostream> // Required for std::cout
 
         for (int i = 0; i < 12; i++) {
             std::cout << "Kv[" << i << "]: " << Kv12[i] << std::endl;
@@ -219,13 +228,13 @@ public:
             Setpoint[0] = 1; Setpoint[1] = -1; Setpoint[2] = -2;
             break;
         case 2:
-            Setpoint[0] = -2; Setpoint[1] = -1; Setpoint[2] = -3;
+            Setpoint[0] = -2; Setpoint[1] = -1; Setpoint[2] = -4;
             break;
         case 3:
-            Setpoint[0] = 1; Setpoint[1] = 2; Setpoint[2] = -2;
+            Setpoint[0] = 1; Setpoint[1] = 2; Setpoint[2] = -3;
             break;
         case 5:
-            Setpoint[0] = 0; Setpoint[1] = 0; Setpoint[2] = -1.5;
+            Setpoint[0] = 0; Setpoint[1] = 0; Setpoint[2] = -2;
             break;            
         default:
             break;
@@ -271,29 +280,40 @@ public:
 
         if (logCount > 0.1){
             logCount = 0;
-            if (logFile.is_open())
+            if (logTxtFile.is_open())
             {
-                logFile << std::fixed << std::setprecision(4);
-                logFile << "+----------------------------------------------+\n";
-                logFile << "| Time: " << currentSimTime << " s\n";
-                logFile << "+----------------------------------------------+\n";
-                logFile << "| Dsrd Position (X, Y, Z): (" << Setpoint[0] << ", " << Setpoint[1] << ", " << Setpoint[2] << ")\n";
-                logFile << "| Quad Position (X, Y, Z): (" << quadPosition.X() << ", " << -quadPosition.Y() << ", " << -quadPosition.Z() + 0.95 << ")\n";
-                logFile << "| Orientation (Roll, Pitch, Yaw): (" << roll << ", " << pitch << ", " << yaw << ")\n";
-                logFile << "| Velocity (Vx, Vy, Vz): (" << quadVelocity.X() << ", " << quadVelocity.Y() << ", " << quadVelocity.Z() << ")\n";
-                logFile << "| Pendulum Angles (Alpha, Beta): (" << alpha << ", " << beta << ")\n";
-                logFile << "| Gamma (GammaAlpha, GammaBeta): (" << gamma_alpha << ", " << gamma_beta << ")\n";
-                logFile << "| Control Forces (Fx, Fy, Fz): (" << u[0] << ", " << u[1] << ", " << u[2] << ")\n";
-                logFile << "+----------------------------------------------+\n\n";
+                logTxtFile << std::fixed << std::setprecision(4);
+                logTxtFile << "+----------------------------------------------+\n";
+                logTxtFile << "| Time: " << currentSimTime << " s\n";
+                logTxtFile << "+----------------------------------------------+\n";
+                logTxtFile << "| Dsrd Position (X, Y, Z): (" << Setpoint[0] << ", " << Setpoint[1] << ", " << Setpoint[2] << ")\n";
+                logTxtFile << "| Quad Position (X, Y, Z): (" << quadPosition.X() << ", " << -quadPosition.Y() << ", " << -quadPosition.Z() + 0.95 << ")\n";
+                logTxtFile << "| Orientation (Roll, Pitch, Yaw): (" << roll << ", " << pitch << ", " << yaw << ")\n";
+                logTxtFile << "| Velocity (Vx, Vy, Vz): (" << quadVelocity.X() << ", " << quadVelocity.Y() << ", " << quadVelocity.Z() << ")\n";
+                logTxtFile << "| Pendulum Angles (Alpha, Beta): (" << alpha << ", " << beta << ")\n";
+                logTxtFile << "| Gamma (GammaAlpha, GammaBeta): (" << gamma_alpha << ", " << gamma_beta << ")\n";
+                logTxtFile << "| Control Forces (Fx, Fy, Fz): (" << u[0] << ", " << u[1] << ", " << u[2] << ")\n";
+                logTxtFile << "+----------------------------------------------+\n\n";
             }
         }
+
+        if (logCsvFile.is_open())
+            {
+                logCsvFile << std::fixed << std::setprecision(4);
+                logCsvFile << currentSimTime << "," << Setpoint[0] << "," << Setpoint[1] << "," << Setpoint[2] << ","
+                           << quadPosition.X() << "," << -quadPosition.Y() << "," << -quadPosition.Z() + 0.95 << ","
+                           << roll << "," << pitch << "," << yaw << ","
+                           << quadVelocity.X() << "," << quadVelocity.Y() << "," << quadVelocity.Z() << ","
+                           << alpha << "," << beta << "," << gamma_alpha << "," << gamma_beta << ","
+                           << u[0] << "," << u[1] << "," << u[2] << "\n";
+            }
     }
 
     ~StabControllerPlugin()
     {
-        if (logFile.is_open())
+        if (logTxtFile.is_open())
         {
-            logFile.close();
+            logTxtFile.close();
         }
     }
 };
