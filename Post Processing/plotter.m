@@ -3,6 +3,10 @@ clc; clear; close all;
 %% GCF Options
 sz = [200, 100, 400, 600];
 fsz = 12;
+set(0, 'DefaultTextInterpreter', 'latex');
+set(0, 'DefaultAxesTickLabelInterpreter', 'latex');
+set(0, 'DefaultLegendInterpreter', 'latex');
+
 %% Load Data
 dataGazebo = readCSVFile('log.csv');
 columnsGazebo = dataGazebo.Properties.VariableNames;
@@ -58,7 +62,7 @@ eposGazebo        = posdesGazebo - posGazebo;
 eposPX4           = posdesPX4 - posPX4;
 
 %% setpoints plotting
-labelNames = {'x_{ref}', 'y_{ref}', 'z_{ref}'};
+labelNames = {'$X_{ref}$', '$Y_{ref}$', '$Z_{ref}$'};
 figHandle = figure;
 set(gcf, 'Position',sz);
 for i = 1:3
@@ -88,7 +92,7 @@ xlabel('t (s)', 'FontSize',fsz);
 
 saveFigureAsPDF(figHandle,'Figures/refernce setpoints.pdf');
 
-labelNames = {'x', 'y', 'z'};
+labelNames = {'X', 'Y', 'Z'};
 figHandle = figure;
 set(gcf, 'Position', sz); % [x, y, width, height]
 for i = 1:3
@@ -118,9 +122,10 @@ for i = 1:3
 end
 xlabel('t (s)', 'FontSize',fsz);
 
+saveas(figHandle,'Figures/trajectory setpoints','svg')
 saveFigureAsPDF(figHandle,'Figures/trajectory setpoints.pdf');
 
-labelNames = {'x', 'y', 'z'};
+labelNames = {'X', 'Y', 'Z'};
 figHandle = figure;
 set(gcf, 'Position', sz); % [x, y, width, height]
 for i = 1:3
@@ -149,6 +154,7 @@ for i = 1:3
 end
 xlabel('t (s)', 'FontSize',fsz);
 
+saveas(figHandle,'Figures/error setpoints','svg')
 saveFigureAsPDF(figHandle,'Figures/error setpoints.pdf');
 
 %% 8-shaped trajectory
@@ -168,7 +174,7 @@ columns = posPX4.Properties.VariableNames;
 eposGazebo        = posdesGazebo - posGazebo;
 eposPX4           = posdesPX4 - posPX4;
 
-labelNames = {'x_{ref}', 'y_{ref}', 'z_{ref}'};
+labelNames = {'$X_{ref}$', '$Y_{ref}$', '$Z_{ref}$'};
 figHandle = figure;
 set(gcf, 'Position',sz);
 for i = 1:3
@@ -198,7 +204,7 @@ xlabel('t (s)', 'FontSize',fsz);
 
 saveFigureAsPDF(figHandle,'Figures/refernce eight.pdf');
 
-labelNames = {'x', 'y', 'z'};
+labelNames = {'X', 'Y', 'Z'};
 figHandle = figure;
 set(gcf, 'Position', sz); % [x, y, width, height]
 for i = 1:3
@@ -228,9 +234,11 @@ for i = 1:3
 end
 xlabel('t (s)', 'FontSize',fsz);
 
+
+saveas(figHandle,'Figures/trajectory eight','svg')
 saveFigureAsPDF(figHandle,'Figures/trajectory eight.pdf');
 
-labelNames = {'x', 'y', 'z'};
+labelNames = {'X', 'Y', 'Z'};
 figHandle = figure;
 set(gcf, 'Position', sz); % [x, y, width, height]
 for i = 1:3
@@ -259,6 +267,7 @@ for i = 1:3
 end
 xlabel('t (s)', 'FontSize',fsz);
 
+saveas(figHandle,'Figures/error eight','svg')
 saveFigureAsPDF(figHandle,'Figures/error eight.pdf');
 
 figHandle = figure;
@@ -266,17 +275,19 @@ plot3(posdesGazebo.X, posdesGazebo.Y, posdesGazebo.Z,...
       '-', 'LineWidth', 1.5, 'DisplayName','Reference');
 hold on;
 plot3(posGazebo.X, posGazebo.Y, posGazebo.Z,...
-      '-.', 'LineWidth', 1.5, 'DisplayName','Gazebo');
+      '-.', 'LineWidth', 1.2, 'DisplayName','Gazebo');
 plot3(posPX4.X, posPX4.Y, posPX4.Z,...
-      ':', 'LineWidth', 2, 'DisplayName','PX4');
+      ':', 'LineWidth', 1.2, 'DisplayName','PX4');
 
 xlabel(labelNames{1},'FontSize',fsz);
 ylabel(labelNames{2},'FontSize',fsz);
 zlabel(labelNames{3},'FontSize',fsz);
 
-grid on; box on;
+%grid on;
+% box on;
 legend('show','Location','northeast','Orientation','vertical','FontSize', fsz)
 
+saveas(figHandle,'Figures/3d eight','svg')
 saveFigureAsPDF(figHandle,'Figures/3d eight.pdf');
 
 %% Functions & Utilities
