@@ -181,7 +181,6 @@ public:
         Lz = loadPosition.Z() - quadPosition.Z();
         // Calculate pendulum angles (alpha, beta)
         L = sqrt((Lx * Lx) + (Ly * Ly) + (Lz * Lz)); // Pendulum length
-        std::cout<<L<<std::endl;
         beta = asin(Lx/L);
         alpha = asin(-Ly/(L*cos(beta)));
 
