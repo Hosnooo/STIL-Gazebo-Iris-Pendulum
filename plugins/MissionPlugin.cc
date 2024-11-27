@@ -146,7 +146,7 @@ public:
         {
             logTxtFile << "LOG FILE -- FULL STATES\n";
             logCsvFile << "Time,Des_Pos_X,Des_Pos_Y,Des_Pos_Z,Quad_Pos_X,Quad_Pos_Y,Quad_Pos_Z,"
-                   << "Roll,Pitch,Yaw,Vx,Vy,Vz,Alpha,Beta,GammaAlpha,GammaBeta,Fx,Fy,Fz\n";
+                   << "Roll,Pitch,Yaw,Vx,Vy,Vz,Lx,Ly,Lz,Alpha,Beta,GammaAlpha,GammaBeta,Fx,Fy,Fz\n";
             isFileInitialized = true;
         }
 
@@ -179,9 +179,9 @@ public:
         Lx = loadPosition.X() - quadPosition.X();
         Ly = loadPosition.Y() - quadPosition.Y();
         Lz = loadPosition.Z() - quadPosition.Z();
-
         // Calculate pendulum angles (alpha, beta)
         L = sqrt((Lx * Lx) + (Ly * Ly) + (Lz * Lz)); // Pendulum length
+        std::cout<<L<<std::endl;
         beta = asin(Lx/L);
         alpha = asin(-Ly/(L*cos(beta)));
 
@@ -287,7 +287,7 @@ public:
                 logTxtFile << "| Time: " << currentSimTime << " s\n";
                 logTxtFile << "+----------------------------------------------+\n";
                 logTxtFile << "| Dsrd Position (X, Y, Z): (" << Setpoint[0] << ", " << Setpoint[1] << ", " << Setpoint[2] << ")\n";
-                logTxtFile << "| Quad Position (X, Y, Z): (" << quadPosition.X() << ", " << -quadPosition.Y() << ", " << -quadPosition.Z() + 0.95 << ")\n";
+                logTxtFile << "| Quad Position (X, Y, Z): (" << quadPosition.X() << ", " << -quadPosition.Y() << ", " << -quadPosition.Z() << ")\n";
                 logTxtFile << "| Orientation (Roll, Pitch, Yaw): (" << roll << ", " << pitch << ", " << yaw << ")\n";
                 logTxtFile << "| Velocity (Vx, Vy, Vz): (" << quadVelocity.X() << ", " << quadVelocity.Y() << ", " << quadVelocity.Z() << ")\n";
                 logTxtFile << "| Pendulum Angles (Alpha, Beta): (" << alpha << ", " << beta << ")\n";
@@ -300,9 +300,10 @@ public:
             {
                 logCsvFile << std::fixed << std::setprecision(4);
                 logCsvFile << currentSimTime << "," << Setpoint[0] << "," << Setpoint[1] << "," << Setpoint[2] << ","
-                           << quadPosition.X() << "," << -quadPosition.Y() << "," << -quadPosition.Z() + 0.95 << ","
+                           << quadPosition.X() << "," << -quadPosition.Y() << "," << -quadPosition.Z() << ","
                            << roll << "," << pitch << "," << yaw << ","
                            << quadVelocity.X() << "," << quadVelocity.Y() << "," << quadVelocity.Z() << ","
+                           << Lx << "," << Ly << "," << Lz << ","
                            << alpha << "," << beta << "," << gamma_alpha << "," << gamma_beta << ","
                            << u[0] << "," << u[1] << "," << u[2] << "\n";
             }
